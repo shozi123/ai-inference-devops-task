@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        # Install your app dependencies if you have a requirements file
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Ensure pytest and any web frameworks (like FastAPI/Flask) are installed
+        pip install pytest httpx  
+
+    - name: Run Tests
+      env:
+        # This tells Python to look in the current root directory for 'main.py'
+        PYTHONPATH: .
+      run: |
+        python3 -m pytest
