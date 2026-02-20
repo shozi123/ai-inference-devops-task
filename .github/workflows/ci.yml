@@ -1,24 +1,30 @@
+
 name: CI Pipeline
 
-on: [push]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: '3.8'
 
-    - name: Install deps
-      run: pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install fastapi uvicorn pytest requests boto3
 
-    - name: Run tests
-      run: pytest
-
-    - name: Build Docker
-      run: docker build -t ai-inference .
+    - name: Run Tests
+      run: |
+        pytest
