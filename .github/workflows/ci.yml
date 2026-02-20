@@ -1,0 +1,38 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then python3 -m pip install -r requirements.txt; fi
+        python3 -m pip install pytest httpx 
+
+    - name: Debug File Structure
+      run: |
+        echo "Listing all files to find tests:"
+        find . -maxdepth 3 -not -path '*/.*'
+
+    - name: Run Tests
+      env:
+        PYTHONPATH: .
+      run: |
+        # Using -v (verbose) will show the name of the one test that IS running
+        python3 -m pytest -v
