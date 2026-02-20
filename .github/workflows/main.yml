@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        # This installs your app's libraries (FastAPI, Flask, etc.)
+        if [ -f requirements.txt ]; then python3 -m pip install -r requirements.txt; fi
+        # This ensures the test runner itself is present
+        python3 -m pip install pytest httpx
+
+    - name: Run Tests
+      env:
+        # This mirrors your local environment so "import main" works
+        PYTHONPATH: .
+      run: |
+        python3 -m pytest
